@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% set title="Performance report" %}{% block content %}<section class="banner"><h2>{{ student.name }} · Performance report</h2><p>Subject-level progress, attendance health, and recommended next steps.</p></section><div class="grid"><div class="card"><div class="statname">Overall average</div><div class="statvalue">{{ stats.avg }}%</div></div><div class="card"><div class="statname">Attendance</div><div class="statvalue">{{ stats.att }}%</div></div><div class="card"><div class="statname">Subjects to focus</div><div class="statvalue">{{ stats.weak|length }}</div></div><div class="card"><div class="statname">ML risk estimate</div><div class="statvalue"><span class="risk {{ stats.risk }}">{{ stats.risk }}</span></div><div class="muted">{{ stats.probability }}% model confidence</div></div></div><div class="detail"><section class="card"><h3>Subject-wise results</h3>
+{% for m in stats.marks %}
+<div class="resultline">
+    <span>
+        {{ m.subject }}
+        
+    </span>
+
+    <b>
+        {{ "%.1f"|format(m.percentage) }}%
+    </b>
+</div>
+{% else %}
+<div class="muted">
+    No assessment marks have been added yet.
+</div>
+{% endfor %}
+section><section class="card"><h3>Recommendations</h3><div class="sub">Suggestions based on current records</div>{% if stats.weak %}<div class="insight"><b>🎯 Study focus</b><p>Spend extra time on {{ stats.weak|join(', ') }} with short daily revision sessions and practice tests.</p></div>{% else %}<div class="insight"><b>🌟 Maintain momentum</b><p>Current recorded marks are at least 60% in each subject. Continue practising and review mistakes.</p></div>{% endif %}<div class="insight"><b>📅 Attendance follow-up</b><p>{% if stats.att<75 %}Attendance is below 75%; discuss a practical improvement plan.{% else %}Attendance meets the 75% target; maintain consistency.{% endif %}</p></div><div class="notice">{{ stats.model_note }} Probability is not a guarantee. Do not use this model alone for decisions.</div></section></div>{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% set title="Student dashboard" %}{% block content %}{% set s=stats %}
+<section class="banner"><h2>Hey {{ user.name.split(' ')[0] }}, ready to level up? ✨</h2><p>Here’s your academic snapshot. Small steps today make a big difference tomorrow.</p></section>
+<div class="grid"><div class="card"><span class="ico">◈</span><div class="statname">Overall average</div><div class="statvalue">{{ s.avg }}%</div><div class="muted">Across {{ s.marks|length }} recorded marks</div></div><div class="card"><span class="ico">◷</span><div class="statname">Attendance</div><div class="statvalue">{{ s.att }}%</div><div class="muted">Target is 75%</div></div><div class="card"><span class="ico">▤</span><div class="statname">Subjects tracked</div><div class="statvalue">{{ s.marks|map(attribute='subject')|unique|list|length }}</div><div class="muted">Current scorecard</div></div><div class="card"><span class="ico">⚑</span><div class="statname">ML risk estimate</div><div class="statvalue"><span class="risk {{ s.risk }}">{{ s.risk }}</span></div><div class="muted">Model confidence: {{ s.probability }}%</div></div></div>
+<div class="columns"><section class="card"><h3>Subject performance</h3><div class="sub">Average score for each subject</div><div class="bars">
+{% for m in s.marks %}
+    {% set pct = m.percentage|round|int %}
+    <div class="barcol">
+        <div class="score">{{ pct }}%</div>
+        <div class="bar"
+             style="height:{{ [pct, 3]|max }}%">
+        </div>
+        <div class="barlabel">
+            {{ m.subject.split(' ')[0] }}
+        </div>
+    </div>
+{% endfor %}
+</div></section><section class="card"><h3>Attendance health</h3><div class="sub">Keep an eye on your attendance</div><div class="donutrow"><div class="donut" style="background:conic-gradient(#655bff {{ s.att }}%,#edf0f7 0)"><div class="donutcenter"><b>{{ s.att }}%</b><span class="muted">attended</span></div></div><div class="legend">Present: {{ s.present }}<br>Classes: {{ s.total }}<br>Target: 75%</div></div></section></div>
+<div class="columns"><section class="card"><h3>Marks breakdown</h3>
+<div class="sub">
+    Average score by subject across all assessments
+</div>
+
+{% for m in s.marks %}
+    <div class="subject">
+        <span>{{ m.subject }}</span>
+        <div class="track">
+            <div class="fill" style="width:{{ m.percentage }}%"></div>
+        </div>
+        <b>{{ "%.1f"|format(m.percentage) }}%</b>
+    </div>
+{% else %}
+    <div class="muted">No marks recorded yet.</div>
+{% endfor %}
+</section><section class="card"><h3>Smart insights</h3><div class="sub">Suggestions based on your records</div>{% if s.weak %}<div class="insight"><b>🎯 Focus on {{ s.weak[0] }}</b><p>{{ s.weak|join(', ') }} {{ 'need' if s.weak|length>1 else 'needs' }} extra practice. Try 20–30 minutes of focused revision daily.</p></div>{% else %}<div class="insight"><b>🌟 Great work so far!</b><p>No recorded subject is below 60%. Keep practising regularly.</p></div>{% endif %}<div class="insight"><b>📅 Attendance tip</b><p>{% if s.att<75 %}Attendance is below 75%. Attend upcoming classes and speak with your teacher.{% else %}You are above the 75% target. Keep it consistent.{% endif %}</p></div><div class="notice">{{ s.model_note }} This is a prototype prediction, not a definitive judgement.</div><a class="btn" style="display:inline-block;margin-top:10px" href="{{ url_for('my_report') }}">View full report →</a></section></div>{% endblock %}
