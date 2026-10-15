@@ -187,7 +187,7 @@ def student_stats(student_id):
         "weak": weak,
         "assessment_count": len(raw_marks)
     }
-
+@app.route("/")
 def index():
     return redirect(url_for("dashboard") if session.get("user_id") else url_for("login"))
 
